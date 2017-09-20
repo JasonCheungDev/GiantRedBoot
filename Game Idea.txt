@@ -1,0 +1,7 @@
+Exec: George
+
+Themes: Bullet Hell, Greyscale Fantasy, 10-Second Gameplay
+
+Game Idea: Twin stick bullet hell shooter, time limited, dungeon crawler.
+
+Members: Daniel, Jason, Jonah, Rhys, Ryan.
