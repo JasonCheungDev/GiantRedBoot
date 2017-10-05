@@ -3,10 +3,32 @@
 public class MovementController : MonoBehaviour {
 
     public float speed = 5.0f;
+    Animator anim;
+
+    private void Start()
+    {
+        anim = GetComponent<Animator>();
+    }
 
     void Update()
     {
-        transform.Translate(Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime, Input.GetAxisRaw("Vertical") * speed * Time.deltaTime, 0);
+        float xVel = Input.GetAxisRaw("Horizontal") * speed * Time.deltaTime;
+        float yVel = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+
+        if (xVel > 0) //-x = left
+        {
+            anim.Play("WalkRight");
+        }else if(xVel < 0)
+        {
+            anim.Play("WalkLeft");
+        }
+        else
+        {
+            anim.Play("girlIdle");
+        }
+        
+        transform.Translate(xVel, yVel, 0);
+
         if (Input.GetButtonDown("Fire1"))
         {
             ClickTransform();
@@ -25,6 +47,3 @@ public class MovementController : MonoBehaviour {
         }
     }
 }
-
-//float xVel = Input.GetAxisRaw("Horizontal");
-//float yVel = Input.GetAxisRaw("Vertical");
