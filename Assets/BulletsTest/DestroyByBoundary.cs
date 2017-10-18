@@ -19,7 +19,7 @@ public class DestroyByBoundary : MonoBehaviour {
     {
         if (collision.gameObject.CompareTag("Projectile"))
         {
-            Destroy(collision.gameObject);
+           Destroy(collision.gameObject);
         }
     }
 

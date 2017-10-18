@@ -3,40 +3,73 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
+    public GameObject[] shotPatterns;
+    public float[] timings;
 
-    public GameObject shot;
-    public GameObject shotSpawn;
+    private int currentShotIndex;
 
-    public float fireRate = 0.5f;
-    private float nextFire = 0.0f;
+    public float currentTime;
 
-    public float rotSpeed = 0.5f;
+    private bool switchingShots;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
+    private Animator anim;
+
+    public string[] animations;
+
+    public GameObject[] shotPatternObjects;
+
+    // Use this for initialization
+    void Start () {
+        currentTime = 0.0f;
+        switchingShots = false;
+        anim = GetComponent<Animator>();
+        shotPatternObjects = new GameObject[shotPatterns.Length];
+
+        for (int i = 0; i < shotPatterns.Length; i++)
+        {
+            GameObject obj = Instantiate(shotPatterns[i], transform.position, transform.rotation);
+            obj.transform.parent = gameObject.transform;
+            obj.SetActive(false);
+            shotPatternObjects[i] = obj;
+        }
+
+        currentTime = timings[currentShotIndex];
+        shotPatternObjects[currentShotIndex].SetActive(true);
+        anim.Play(animations[currentShotIndex], -1, 0.0f);
+    }
 	
 	// Update is called once per frame
 	void Update () {
 
-        if(transform.rotation.z <= -80.0f)
-        {
-            //transform.Rotate(-Vector3.forward * 200.0f * Time.deltaTime);
-            //transform.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, -90.0f), Quaternion.Euler(0, 0, 90.0f), Time.time * rotSpeed);
-        }
-        else if(transform.rotation.z >= 80.0f)
-        {
-            //transform.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, 90.0f), Quaternion.Euler(0, 0, -90.0f), Time.time * rotSpeed);
-        }
-            
+        
 
-
-        if (Time.time > nextFire)
+        if(currentTime <= 0.0f)
         {
-            nextFire = Time.time + fireRate;
-            //GameObject clone = 
-            Instantiate(shot, shotSpawn.transform.position, shotSpawn.transform.rotation); // as GameObject;
+            switchingShots = true;
         }
+
+        if(switchingShots)
+        {
+            shotPatternObjects[currentShotIndex].SetActive(false);
+            IncrementShotPattern();
+            currentTime = timings[currentShotIndex];
+            shotPatternObjects[currentShotIndex].SetActive(true);
+            anim.Play(animations[currentShotIndex], -1, 0.0f);
+            switchingShots = false;
+        }
+
+        currentTime -= Time.deltaTime;
 	}
+
+    void IncrementShotPattern()
+    {
+        if(currentShotIndex != shotPatterns.Length - 1)
+        {
+            currentShotIndex++;
+        }
+        else
+        {
+            currentShotIndex = 0;
+        }
+    }
 }
