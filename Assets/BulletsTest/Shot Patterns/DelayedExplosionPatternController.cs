@@ -7,13 +7,15 @@ public class DelayedExplosionPatternController : MonoBehaviour {
     Rigidbody2D shotrb;
     public GameObject shotType;
     public float speed;
-    public float fireRate = 1.0f;
+    public float fireDelay = 1.0f;
     private float nextFire = 0.0f;
 
-    public float explosionRate = 2.5f;
+    public float explosionDelay = 0.5f;
     private float nextExplosion = 1.0f;
 
-    GameObject singleShot;
+    private float counter = 0f;
+
+    public GameObject singleShot;
 
     // Use this for initialization
     void Start () {
@@ -22,27 +24,21 @@ public class DelayedExplosionPatternController : MonoBehaviour {
         //shotrb.velocity = -transform.up * speed;
     }
 
-    private void OnEnable()
-    {
-        //fireRate = 1.0f;
-       // nextFire = 0.0f;
-
-        //explosionRate = 2.5f;
-       // nextExplosion = 1.0f;
-    }
-
     // Update is called once per frame
     void Update () {
         if (Time.time > nextFire)
         {
-            nextFire = Time.time + fireRate;
+            nextFire = Time.time + fireDelay;            // fire again after fireDelay 
+            nextExplosion = Time.time + explosionDelay;  // explode bullet after explosionDelay
             singleShot = Instantiate(shotType, transform.position, transform.rotation) as GameObject;
+            singleShot.GetComponent<ForwardMover>().speed = speed;
         }
 
         if (Time.time > nextExplosion)
         {
-            nextExplosion = Time.time + explosionRate;
+            nextExplosion = float.PositiveInfinity;     // ensure bullet doesn't explode multiples
 
+            // Create a circular explosion of bullets
             for (int i = 0; i < 48; i++)
             {
                 Instantiate(shotType, singleShot.transform.position, Quaternion.Euler(new Vector3(singleShot.transform.rotation.x, singleShot.transform.rotation.y, singleShot.transform.rotation.z + (7.5f * i))));
