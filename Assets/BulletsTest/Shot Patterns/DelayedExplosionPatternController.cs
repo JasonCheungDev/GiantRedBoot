@@ -39,9 +39,9 @@ public class DelayedExplosionPatternController : MonoBehaviour {
             nextExplosion = float.PositiveInfinity;     // ensure bullet doesn't explode multiples
 
             // Create a circular explosion of bullets
-            for (int i = 0; i < 48; i++)
+            for (int i = 0; i < 12; i++)
             {
-                Instantiate(shotType, singleShot.transform.position, Quaternion.Euler(new Vector3(singleShot.transform.rotation.x, singleShot.transform.rotation.y, singleShot.transform.rotation.z + (7.5f * i))));
+                Instantiate(shotType, singleShot.transform.position, Quaternion.Euler(new Vector3(singleShot.transform.rotation.x, singleShot.transform.rotation.y, singleShot.transform.rotation.z + (30f * i))));
             }
 
             Destroy(singleShot);

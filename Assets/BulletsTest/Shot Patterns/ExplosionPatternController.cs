@@ -25,9 +25,14 @@ public class ExplosionPatternController : MonoBehaviour {
         {
             nextFire = Time.time + fireRate;
 
-            for(int i = 0; i < 48; i++)
+            //for(int i = 0; i < 48; i++)
+            //{
+            //    Instantiate(shotType, transform.position, Quaternion.Euler(new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z + (7.5f * i))) );
+            //}
+
+            for (int i = 0; i < 24; i++)
             {
-                Instantiate(shotType, transform.position, Quaternion.Euler(new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z + (7.5f * i))) );
+                Instantiate(shotType, transform.position, Quaternion.Euler(new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z + (15f * i))));
             }
 
         }
