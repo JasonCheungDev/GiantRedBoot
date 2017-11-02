@@ -13,6 +13,9 @@ public class DragonController : MonoBehaviour {
 
     public GameObject FireProjectilePrefab;
 
+    private Coroutine firebreathCoroutine;
+    private bool isFirebreathOn = false;
+
 
 	// Use this for initialization
 	void Start ()
@@ -52,12 +55,78 @@ public class DragonController : MonoBehaviour {
         shaker.ShakeObject(2f, 0.5f);
     }
 
-    public void AnimEvent_FireBreath()
+    public void AnimEvent_PrepareFirebreath()
     {
-        StartCoroutine(FireBreathAttack());
+        anim.SetFloat("HeadLeftRightRatio", Random.Range(0f, 1f));
     }
 
+    public void AnimEvent_FireBreath()
+    {
+        if (!isFirebreathOn)
+        {
+            isFirebreathOn = true;  // possible race condition
+            firebreathCoroutine = StartCoroutine(BreathFire());
+        }
+    }
 
+    public void AnimEvent_StopFireBreath()
+    {
+        if (firebreathCoroutine != null && isFirebreathOn)
+        {
+            StopCoroutine(firebreathCoroutine);
+            isFirebreathOn = false;
+        }
+    }
+
+    public void AnimEvent_DisableLimb(string name)
+    {
+        switch (name)
+        {
+            case "head":
+                animatedHead.gameObject.SetActive(false);
+                break;
+            case "body":
+                animatedBody.gameObject.SetActive(false);
+                break;
+            case "left arm":
+                animatedLeftArm.gameObject.SetActive(false);
+                break;
+            case "right arm":
+                animatedRightArm.gameObject.SetActive(false);
+                break;
+        }
+    }
+
+    public void AnimEvent_EnableLimb(string name)
+    {
+        switch (name)
+        {
+            case "head":
+                animatedHead.gameObject.SetActive(true);
+                break;
+            case "body":
+                animatedBody.gameObject.SetActive(true);
+                break;
+            case "left arm":
+                animatedLeftArm.gameObject.SetActive(true);
+                break;
+            case "right arm":
+                animatedRightArm.gameObject.SetActive(true);
+                break;
+        }
+    }
+
+    IEnumerator BreathFire()
+    {
+        float fireRate = 0.2f;
+        while (true)
+        {
+            CastRowOfFire(animatedHead.position, -animatedHead.transform.up, animatedHead.rotation);
+            yield return new WaitForSeconds(fireRate);
+        }
+    }
+
+    // DEPRECATED
     IEnumerator FireBreathAttack()
     {
         // Disable animated limbs 
