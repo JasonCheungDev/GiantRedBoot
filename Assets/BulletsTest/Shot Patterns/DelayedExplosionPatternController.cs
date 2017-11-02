@@ -8,6 +8,8 @@ public class DelayedExplosionPatternController : MonoBehaviour {
     public GameObject shotType;
     public float speed;
     public float fireDelay = 1.0f;
+    [Tooltip("Should be a number 360 is divisble by.")]
+    public float angleBetweenShots = 15f;
     private float nextFire = 0.0f;
 
     public float explosionDelay = 0.5f;
@@ -22,6 +24,11 @@ public class DelayedExplosionPatternController : MonoBehaviour {
         shotrb = shotType.GetComponent<Rigidbody2D>();
         shotrb.GetComponent<ForwardMover>().speed = speed;
         //shotrb.velocity = -transform.up * speed;
+    }
+
+    void OnEnable()
+    {
+        nextFire = Time.time;
     }
 
     // Update is called once per frame
@@ -39,12 +46,15 @@ public class DelayedExplosionPatternController : MonoBehaviour {
             nextExplosion = float.PositiveInfinity;     // ensure bullet doesn't explode multiples
 
             // Create a circular explosion of bullets
-            for (int i = 0; i < 48; i++)
+            float angleCounter = 0f;
+            while (angleCounter <= 360f)
             {
-                Instantiate(shotType, singleShot.transform.position, Quaternion.Euler(new Vector3(singleShot.transform.rotation.x, singleShot.transform.rotation.y, singleShot.transform.rotation.z + (7.5f * i))));
+                Instantiate(shotType, singleShot.transform.position, Quaternion.Euler(new Vector3(singleShot.transform.rotation.x, singleShot.transform.rotation.y, singleShot.transform.rotation.z + angleCounter)));
+                angleCounter += angleBetweenShots;
             }
 
-            Destroy(singleShot);
+            if (singleShot)
+                Destroy(singleShot);
         }
     }
 }

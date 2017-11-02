@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DragonController : MonoBehaviour {
 
@@ -12,13 +13,25 @@ public class DragonController : MonoBehaviour {
     private Transform freeLimbs, head, body, leftArm, rightArm;
 
     public GameObject FireProjectilePrefab;
+    public GameObject FirebreathPattern;        // shot pattern used in fire breath attack
+    public GameObject LeftRightPattern;         // shot pattern used in head left to right attack
+    public GameObject SwingPattern;             // shot pattern used in swing attack
 
     private Coroutine firebreathCoroutine;
     private bool isFirebreathOn = false;
 
+    ///////////////////////
 
-	// Use this for initialization
-	void Start ()
+    public float[] timings;
+    public UnityEvent[] actions;
+
+    private int currentShotIndex;
+    private float currentTime;
+    private bool switchingShots;
+
+
+    // Use this for initialization
+    void Start ()
     {
         anim = GetComponent<Animator>();
         animatedHead = transform.Find("Dragon Head");
@@ -32,7 +45,11 @@ public class DragonController : MonoBehaviour {
         leftArm = freeLimbs.Find("Dragon Left Arm");
         rightArm = freeLimbs.Find("Dragon Right Arm");
 
-        anim.SetBool("LeftSwipe", true);
+        ////
+
+        currentTime = timings[0];
+        switchingShots = false;
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -40,14 +57,40 @@ public class DragonController : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            anim.SetBool("LeftSwipe", true);
+            anim.SetTrigger("LeftSwipe");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             StartCoroutine(FireBreathAttack());
         }
-	}
+
+        ////
+
+        if (currentTime <= 0.0f)
+        {
+            actions[currentShotIndex].Invoke();
+
+            IncrementShotPattern();
+
+            currentTime = timings[currentShotIndex] + currentTime;  // add current time to keep on a strict schedule
+        }
+
+        currentTime -= Time.deltaTime;
+    }
+
+    private void IncrementShotPattern()
+    {
+        if (currentShotIndex != timings.Length - 1)
+        {
+            currentShotIndex++;
+        }
+        else
+        {
+            currentShotIndex = 0;
+        }
+    }
+
 
     public void AnimEvent_ShakeCamera()
     {
@@ -76,6 +119,16 @@ public class DragonController : MonoBehaviour {
             StopCoroutine(firebreathCoroutine);
             isFirebreathOn = false;
         }
+    }
+
+    public void AnimEvent_ActivateObject(string objectName)
+    {
+        transform.FindDeepChild(objectName).gameObject.SetActive(true);
+    }
+
+    public void AnimEvent_DeactivateObject(string objectName)
+    {
+        transform.FindDeepChild(objectName).gameObject.SetActive(false);
     }
 
     public void AnimEvent_DisableLimb(string name)
@@ -114,6 +167,23 @@ public class DragonController : MonoBehaviour {
                 animatedRightArm.gameObject.SetActive(true);
                 break;
         }
+    }
+
+    public void Action_StartAnimation(string name)
+    {
+        anim.SetBool(name, true);
+    }
+
+    public void Action_EndAnimation(string name)
+    {
+        anim.SetBool(name, false);
+    }
+
+    public void Action_Flip()
+    {
+        var scale = transform.localScale;
+        scale.x = -scale.x;
+        transform.localScale = scale;
     }
 
     IEnumerator BreathFire()
@@ -289,4 +359,10 @@ public struct PositionRotation
         this.position = position;
         this.direction = direction;
     }
+}
+
+public struct Foobar
+{
+    public string hello;
+    public string moto;
 }
