@@ -61,27 +61,28 @@ public class DragonController : MonoBehaviour {
     IEnumerator FireBreathAttack()
     {
         // Disable animated limbs 
-        ShowAnimated(false);
+        // ShowAnimated(false);
+        anim.enabled = false; 
 
         // Show free head and arm only.  
-        CopyFrame();
-        head.gameObject.SetActive(true);
-        leftArm.gameObject.SetActive(true);
+        // CopyFrame();
+        //head.gameObject.SetActive(true);
+        //leftArm.gameObject.SetActive(true);
 
         // Calculate head position and show 
         var headLoc = GetRandomHeadPos();
         var offMapPos = headLoc.position + headLoc.direction * 2f;
         var finalPos = headLoc.position + headLoc.direction * -1f;
-        head.position = offMapPos;
-        head.rotation = headLoc.rotation;
-        head.gameObject.SetActive(true);
+        animatedHead.position = offMapPos;
+        animatedHead.rotation = headLoc.rotation;
+        // head.gameObject.SetActive(true);
 
         // Move head towards position
         float elapsedTime = 0;
         float time = 1f;        // overall duration
         while (elapsedTime < time)
         {
-            head.position = Vector3.Slerp(offMapPos, finalPos, (elapsedTime / time));
+            animatedHead.position = Vector3.Slerp(offMapPos, finalPos, (elapsedTime / time));
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -104,14 +105,16 @@ public class DragonController : MonoBehaviour {
         elapsedTime = 0f;
         while (elapsedTime < time)
         {
-            head.position = Vector3.Slerp(finalPos, offMapPos, (elapsedTime / time));
+            animatedHead.position = Vector3.Slerp(finalPos, offMapPos, (elapsedTime / time));
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
         // finish animation
-        ShowCopy(false);
-        ShowAnimated(true);
+        // ShowCopy(false);
+        // ShowAnimated(true);
+        // PasteFrame();
+        anim.enabled = true;
         anim.SetBool("LeftSwipe", false);
     }
 
@@ -130,6 +133,14 @@ public class DragonController : MonoBehaviour {
         body.Copy(animatedBody);
         leftArm.Copy(animatedLeftArm);
         rightArm.Copy(animatedRightArm);
+    }
+
+    void PasteFrame()
+    {
+        animatedHead.Copy(head);
+        animatedBody.Copy(body);
+        animatedLeftArm.Copy(leftArm);
+        animatedRightArm.Copy(rightArm);
     }
 
     void ShowCopy(bool visible)

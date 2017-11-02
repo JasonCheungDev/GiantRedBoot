@@ -10,5 +10,9 @@ public class DestroyOnArm : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+        else if (other.CompareTag("Player"))
+        {
+            Destroy(other.gameObject);
+        }
     }
 }
