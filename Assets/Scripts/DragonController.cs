@@ -337,6 +337,13 @@ public static class TransformExtensions
         transform.rotation = target.rotation;
         transform.localScale = target.localScale;
     }
+
+    public static void FlipX(this Transform transform)
+    {
+        var scale = transform.localScale;   // get current scale
+        scale.x = -scale.x;
+        transform.localScale = scale;       // apply flipped scale (can't change x directly)
+    }
 }
 
 public struct PositionRotation
