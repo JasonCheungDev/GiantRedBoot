@@ -19,11 +19,13 @@ public class ScreenFader : MonoBehaviour {
 
     IEnumerator Fade(float aValue, float aTime)
     {
-        float alpha = image.color.a;
+        Color currentColor = image.color;
+        float initialAlpha = image.color.a;
+
         for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / aTime)
         {
-            Color newColor = new Color(1, 1, 1, Mathf.Lerp(alpha, aValue, t));
-            image.color = newColor;
+            currentColor.a = Mathf.Lerp(initialAlpha, aValue, t);
+            image.color = currentColor;
             yield return null;
         }
     }

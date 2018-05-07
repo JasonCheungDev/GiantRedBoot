@@ -36,6 +36,7 @@ public class GameController : MonoBehaviour
 
     private void NextAction()
     {
+        Debug.Log("GameController: Next Action");
         index++;
         if (index < actions.Length)
             actions[index].Invoke();

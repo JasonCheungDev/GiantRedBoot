@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,10 +23,9 @@ public class DragonController : MonoBehaviour {
 
     ///////////////////////
 
-    public float[] timings;
-    public UnityEvent[] actions;
+    public ActionTimePair[] events;
 
-    private int currentShotIndex;
+    private int currentEventIndex;
     private float currentTime;
     private bool switchingShots;
 
@@ -47,9 +47,18 @@ public class DragonController : MonoBehaviour {
 
         ////
 
-        currentTime = timings[0];
         switchingShots = false;
         anim = GetComponent<Animator>();
+
+        var leftRightAnimState = GetComponent<Animator>().GetBehaviour<SimpleStatemachineBehaviour>("DragonHeadLeftRightState");
+        leftRightAnimState.OnStateEntered += () =>
+        {
+            transform.FindDeepChild("HeadLeftRightShotPattern").gameObject.SetActive(true);
+        };
+        leftRightAnimState.OnStateExited += () =>
+        {
+            transform.FindDeepChild("HeadLeftRightShotPattern").gameObject.SetActive(false);
+        };
     }
 
     // Update is called once per frame
@@ -69,11 +78,11 @@ public class DragonController : MonoBehaviour {
 
         if (currentTime <= 0.0f)
         {
-            actions[currentShotIndex].Invoke();
-
             IncrementShotPattern();
 
-            currentTime = timings[currentShotIndex] + currentTime;  // add current time to keep on a strict schedule
+            events[currentEventIndex].events.Invoke();
+
+            currentTime = events[currentEventIndex].delay + currentTime;    // add current time to keep on a strict schedule
         }
 
         currentTime -= Time.deltaTime;
@@ -81,14 +90,10 @@ public class DragonController : MonoBehaviour {
 
     private void IncrementShotPattern()
     {
-        if (currentShotIndex != timings.Length - 1)
-        {
-            currentShotIndex++;
-        }
+        if (currentEventIndex != events.Length - 1)
+            currentEventIndex++;
         else
-        {
-            currentShotIndex = 0;
-        }
+            currentEventIndex = 0;
     }
 
 
@@ -100,7 +105,7 @@ public class DragonController : MonoBehaviour {
 
     public void AnimEvent_PrepareFirebreath()
     {
-        anim.SetFloat("HeadLeftRightRatio", Random.Range(0f, 1f));
+        anim.SetFloat("HeadLeftRightRatio", UnityEngine.Random.Range(0f, 1f));
     }
 
     public void AnimEvent_FireBreath()
@@ -304,7 +309,7 @@ public class DragonController : MonoBehaviour {
         var bounds = Camera.main.OrthographicBounds();
 
         // get random direction from center of map 
-        Vector3 dir = Quaternion.Euler(0, 0, Random.Range(0f, 180f)) * Vector3.right;
+        Vector3 dir = Quaternion.Euler(0, 0, UnityEngine.Random.Range(0f, 180f)) * Vector3.right;
         Debug.Log(dir);
         Ray ray = new Ray(Vector3.zero, dir);
 
@@ -372,4 +377,11 @@ public struct Foobar
 {
     public string hello;
     public string moto;
+}
+
+[Serializable]
+public class ActionTimePair
+{
+    public UnityEvent events;
+    public float delay;
 }
