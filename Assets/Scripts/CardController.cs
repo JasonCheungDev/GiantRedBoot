@@ -11,7 +11,7 @@ public class CardController : MonoBehaviour {
     public string dialogueText;
     public float characterDelay = 0.2f; // time till next character is printed 
     public bool flipHorizontally = true;
-    public bool LoadingText { get { return textIndex < dialogueText.Length - 1; } }
+    public bool LoadingText { get { return textIndex < dialogueText.Length; } }
 
     private int textIndex = 0;
     private Animator anim;
@@ -39,6 +39,12 @@ public class CardController : MonoBehaviour {
     }
 
 
+    public void SetCharacterDelay(float delay)
+    {
+        characterDelay = delay;
+    }
+
+
     public void SetNextText(string message, int startAt)
     {
         Debug.Log("Setnext text called starting at character " + startAt);
@@ -53,6 +59,15 @@ public class CardController : MonoBehaviour {
     }
 
 
+    // seperated for UnityEvents 
+    public void SetTextIndex(int startAt)
+    {
+        textIndex = startAt;
+        RefreshText();
+    }
+
+
+    // seperated for UnityEvents 
     public void SetNextText(string message)
     {
         Debug.Log("Setnext text called " + message);
@@ -72,7 +87,7 @@ public class CardController : MonoBehaviour {
         Debug.Log(" Skiping text for " + gameObject);
         StopCoroutine(textLoaderCoroutine);
 
-        textIndex = dialogueText.Length - 1;
+        textIndex = dialogueText.Length;
         RefreshText();
     }
 
@@ -81,7 +96,7 @@ public class CardController : MonoBehaviour {
     {
         yield return null;  // wait one frame before doing anything
 
-        while(textIndex < dialogueText.Length - 1)
+        while(textIndex < dialogueText.Length)
         {
             textIndex++;
             RefreshText();

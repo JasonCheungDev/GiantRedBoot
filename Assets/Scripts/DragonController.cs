@@ -59,6 +59,8 @@ public class DragonController : MonoBehaviour {
         {
             transform.FindDeepChild("HeadLeftRightShotPattern").gameObject.SetActive(false);
         };
+
+        currentEventIndex = -1;
     }
 
     // Update is called once per frame
@@ -265,7 +267,7 @@ public class DragonController : MonoBehaviour {
     void CastRowOfFire(Vector2 origin, Vector2 direction, Quaternion bulletRot)
     {
         var perpendicular = new Vector2(direction.y, -direction.x).normalized;
-
+        
         for (float i = -10; i < 10; i += 1f)
             Instantiate(FireProjectilePrefab, origin + perpendicular * i, bulletRot); 
     }
