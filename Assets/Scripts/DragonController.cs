@@ -25,13 +25,13 @@ public class DragonController : MonoBehaviour {
 
     public ActionTimePair[] events;
 
-    private int currentEventIndex;
+    public int currentEventIndex;
     private float currentTime;
     private bool switchingShots;
 
 
     // Use this for initialization
-    void Start ()
+    void Awake ()
     {
         anim = GetComponent<Animator>();
         animatedHead = transform.Find("Dragon Head");
@@ -47,8 +47,12 @@ public class DragonController : MonoBehaviour {
 
         ////
 
-        switchingShots = false;
         anim = GetComponent<Animator>();
+    }
+
+    void Start()
+    {
+        switchingShots = false;
 
         var leftRightAnimState = GetComponent<Animator>().GetBehaviour<SimpleStatemachineBehaviour>("DragonHeadLeftRightState");
         leftRightAnimState.OnStateEntered += () =>
@@ -60,7 +64,15 @@ public class DragonController : MonoBehaviour {
             transform.FindDeepChild("HeadLeftRightShotPattern").gameObject.SetActive(false);
         };
 
-        currentEventIndex = -1;
+        currentEventIndex = 5; //-1;
+    }
+
+    void OnDisable()
+    {
+        anim.SetBool("LeftSwipe", false);
+        anim.SetBool("Slam", false);
+        anim.SetBool("LeftSwing", false);
+        anim.SetBool("Death", false);
     }
 
     // Update is called once per frame
@@ -98,11 +110,22 @@ public class DragonController : MonoBehaviour {
             currentEventIndex = 0;
     }
 
+    public void SetEventIndex(int index)
+    {
+        currentEventIndex = index;
+    }
+
 
     public void AnimEvent_ShakeCamera()
     {
         var shaker = Camera.main.GetComponent<Shaker>();
         shaker.ShakeObject(2f, 0.5f);
+    }
+
+    public void AnimEvent_MinorShakeCamera()
+    {
+        var shaker = Camera.main.GetComponent<Shaker>();
+        shaker.ShakeObject(1f, 0.3f);
     }
 
     public void AnimEvent_PrepareFirebreath()
@@ -174,6 +197,14 @@ public class DragonController : MonoBehaviour {
                 animatedRightArm.gameObject.SetActive(true);
                 break;
         }
+    }
+
+    public void AnimEvent_SmokeBreath(int on)
+    {
+        if (on == 0)
+            animatedHead.GetComponentInChildren<ParticleSystem>().Stop();
+        else
+            animatedHead.GetComponentInChildren<ParticleSystem>().Play();
     }
 
     public void Action_StartAnimation(string name)

@@ -3,11 +3,19 @@
 public class MovementController : MonoBehaviour {
 
     public float speed = 5.0f;
-    Animator anim;
+    public GameController game; 
+    public ParticleSystem deathVfx;
+    public ParticleSystem chargingVfx; 
+
+    private Animator anim;
+    private Collider2D col;
+    private Renderer rend;
 
     private void Start()
     {
         anim = GetComponent<Animator>();
+        col = GetComponent<Collider2D>();
+        rend = GetComponent<Renderer>();
     }
 
     void Update()
@@ -45,5 +53,27 @@ public class MovementController : MonoBehaviour {
             //print(mousePos.x + " y: " + mousePos.y);
             //Debug.Log("Target Position: " + hit.collider.gameObject.transform.position);
         }
+    }
+
+    public void Die()
+    {
+        // update player status 
+        chargingVfx.Stop();
+        deathVfx.Play();
+        col.enabled = false;
+        rend.enabled = false;
+        this.enabled = false;
+
+        // update game status
+        game.enabled = true;
+        game.GameOver();
+    }
+
+    public void Resurrect()
+    {
+        chargingVfx.Play();
+        col.enabled = true;
+        rend.enabled = true;
+        this.enabled = true;
     }
 }
