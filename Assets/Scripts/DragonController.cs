@@ -44,10 +44,6 @@ public class DragonController : MonoBehaviour {
         body = freeLimbs.Find("Dragon Body");
         leftArm = freeLimbs.Find("Dragon Left Arm");
         rightArm = freeLimbs.Find("Dragon Right Arm");
-
-        ////
-
-        anim = GetComponent<Animator>();
     }
 
     void Start()
@@ -64,7 +60,7 @@ public class DragonController : MonoBehaviour {
             transform.FindDeepChild("HeadLeftRightShotPattern").gameObject.SetActive(false);
         };
 
-        currentEventIndex = 5; //-1;
+        currentEventIndex = -1;
     }
 
     void OnDisable()
@@ -78,18 +74,6 @@ public class DragonController : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-		if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            anim.SetTrigger("LeftSwipe");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            StartCoroutine(FireBreathAttack());
-        }
-
-        ////
-
         if (currentTime <= 0.0f)
         {
             IncrementShotPattern();
@@ -131,24 +115,6 @@ public class DragonController : MonoBehaviour {
     public void AnimEvent_PrepareFirebreath()
     {
         anim.SetFloat("HeadLeftRightRatio", UnityEngine.Random.Range(0f, 1f));
-    }
-
-    public void AnimEvent_FireBreath()
-    {
-        if (!isFirebreathOn)
-        {
-            isFirebreathOn = true;  // possible race condition
-            firebreathCoroutine = StartCoroutine(BreathFire());
-        }
-    }
-
-    public void AnimEvent_StopFireBreath()
-    {
-        if (firebreathCoroutine != null && isFirebreathOn)
-        {
-            StopCoroutine(firebreathCoroutine);
-            isFirebreathOn = false;
-        }
     }
 
     public void AnimEvent_ActivateObject(string objectName)
@@ -223,149 +189,20 @@ public class DragonController : MonoBehaviour {
         scale.x = -scale.x;
         transform.localScale = scale;
     }
-
-    IEnumerator BreathFire()
-    {
-        float fireRate = 0.2f;
-        while (true)
-        {
-            CastRowOfFire(animatedHead.position, -animatedHead.transform.up, animatedHead.rotation);
-            yield return new WaitForSeconds(fireRate);
-        }
-    }
-
-    // DEPRECATED
-    IEnumerator FireBreathAttack()
-    {
-        // Disable animated limbs 
-        // ShowAnimated(false);
-        anim.enabled = false; 
-
-        // Show free head and arm only.  
-        // CopyFrame();
-        //head.gameObject.SetActive(true);
-        //leftArm.gameObject.SetActive(true);
-
-        // Calculate head position and show 
-        var headLoc = GetRandomHeadPos();
-        var offMapPos = headLoc.position + headLoc.direction * 2f;
-        var finalPos = headLoc.position + headLoc.direction * -1f;
-        animatedHead.position = offMapPos;
-        animatedHead.rotation = headLoc.rotation;
-        // head.gameObject.SetActive(true);
-
-        // Move head towards position
-        float elapsedTime = 0;
-        float time = 1f;        // overall duration
-        while (elapsedTime < time)
-        {
-            animatedHead.position = Vector3.Slerp(offMapPos, finalPos, (elapsedTime / time));
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        // pause for player to hide 
-        yield return new WaitForSeconds(2f);
-
-        // BLAST em 
-        float fireRate = 0.2f;
-        float fireDuration = 3f;
-        elapsedTime = 0f;
-        while (elapsedTime < fireDuration)
-        {
-            CastRowOfFire(finalPos, -headLoc.direction, headLoc.rotation);
-            elapsedTime += fireRate;
-            yield return new WaitForSeconds(fireRate);
-        }
-
-        // Move head off map
-        elapsedTime = 0f;
-        while (elapsedTime < time)
-        {
-            animatedHead.position = Vector3.Slerp(finalPos, offMapPos, (elapsedTime / time));
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        // finish animation
-        // ShowCopy(false);
-        // ShowAnimated(true);
-        // PasteFrame();
-        anim.enabled = true;
-        anim.SetBool("LeftSwipe", false);
-    }
-
-    void CastRowOfFire(Vector2 origin, Vector2 direction, Quaternion bulletRot)
-    {
-        var perpendicular = new Vector2(direction.y, -direction.x).normalized;
-        
-        for (float i = -10; i < 10; i += 1f)
-            Instantiate(FireProjectilePrefab, origin + perpendicular * i, bulletRot); 
-    }
-
-    void CopyFrame()
-    {
-        // Copies the current location of the animated limbs to the free limbs 
-        head.Copy(animatedHead);
-        body.Copy(animatedBody);
-        leftArm.Copy(animatedLeftArm);
-        rightArm.Copy(animatedRightArm);
-    }
-
-    void PasteFrame()
-    {
-        animatedHead.Copy(head);
-        animatedBody.Copy(body);
-        animatedLeftArm.Copy(leftArm);
-        animatedRightArm.Copy(rightArm);
-    }
-
-    void ShowCopy(bool visible)
-    {
-        head.gameObject.SetActive(visible);
-        body.gameObject.SetActive(visible);
-        leftArm.gameObject.SetActive(visible);
-        rightArm.gameObject.SetActive(visible);
-    }
-
-    void ShowAnimated(bool visible)
-    {
-        animatedHead.gameObject.SetActive(visible);
-        animatedBody.gameObject.SetActive(visible);
-        animatedLeftArm.gameObject.SetActive(visible);
-        animatedRightArm.gameObject.SetActive(visible);
-    }
-
-    PositionRotation GetRandomHeadPos()
-    {
-        // Get bounds of visible map
-        var bounds = Camera.main.OrthographicBounds();
-
-        // get random direction from center of map 
-        Vector3 dir = Quaternion.Euler(0, 0, UnityEngine.Random.Range(0f, 180f)) * Vector3.right;
-        Debug.Log(dir);
-        Ray ray = new Ray(Vector3.zero, dir);
-
-        // get intersection point on bounds 
-        float intersectDist = 0f;
-        bounds.IntersectRay(ray, out intersectDist);    // distance is negative if inside bounds (guessing) 
-
-        return new PositionRotation(dir * -intersectDist, dir); 
-    }
 }
 
-public static class CameraExtensions
-{
-    public static Bounds OrthographicBounds(this Camera camera)
-    {
-        float screenAspect = (float)Screen.width / (float)Screen.height;
-        float cameraHeight = camera.orthographicSize * 2;
-        Bounds bounds = new Bounds(
-            Vector3.zero,
-            new Vector3(cameraHeight * screenAspect, cameraHeight, 0));
-        return bounds;
-    }
-}
+//public static class CameraExtensions
+//{
+//    public static Bounds OrthographicBounds(this Camera camera)
+//    {
+//        float screenAspect = (float)Screen.width / (float)Screen.height;
+//        float cameraHeight = camera.orthographicSize * 2;
+//        Bounds bounds = new Bounds(
+//            Vector3.zero,
+//            new Vector3(cameraHeight * screenAspect, cameraHeight, 0));
+//        return bounds;
+//    }
+//}
 
 public static class TransformExtensions
 {
@@ -404,12 +241,6 @@ public struct PositionRotation
         this.position = position;
         this.direction = direction;
     }
-}
-
-public struct Foobar
-{
-    public string hello;
-    public string moto;
 }
 
 [Serializable]
