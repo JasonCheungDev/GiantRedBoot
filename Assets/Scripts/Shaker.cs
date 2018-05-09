@@ -40,6 +40,16 @@ public class Shaker : MonoBehaviour
         if (!isRunning) StartCoroutine(Shake());//Only call the coroutine if it isn't currently running. Otherwise, just set the variables.
     }
 
+    // Convenience function for events
+    public void MajorShake()
+    {
+        ShakeObject(2f, 0.5f);
+    }
+    public void MinorShake()
+    {
+        ShakeObject(1f, 0.3f);
+    }
+
     public void ShakeObject(float amount, float duration)
     {
 
