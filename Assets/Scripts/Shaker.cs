@@ -8,6 +8,7 @@ using System.Collections;
 
 public class Shaker : MonoBehaviour
 {
+    public AudioSource shakeSound;
 
     public bool debugMode = false;//Test-run/Call ShakeCamera() on start
 
@@ -33,7 +34,6 @@ public class Shaker : MonoBehaviour
 
     void ShakeObject()
     {
-
         startAmount = shakeAmount;//Set default (start) values
         startDuration = shakeDuration;//Set default (start) values
 
@@ -65,6 +65,8 @@ public class Shaker : MonoBehaviour
     IEnumerator Shake()
     {
         isRunning = true;
+
+        if (shakeSound != null) shakeSound.Play();
 
         while (shakeDuration > 0.01f)
         {

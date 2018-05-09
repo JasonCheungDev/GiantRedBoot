@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SpreadShotPatternController : MonoBehaviour {
+
+    public UnityEvent shotFired;
 
     Rigidbody2D shotrb;
     public GameObject shotType;
@@ -41,6 +44,9 @@ public class SpreadShotPatternController : MonoBehaviour {
 
                 angleCounter += angleBetweenShots;
             }
+
+            // raise event
+            shotFired.Invoke();
         }
     }
 }

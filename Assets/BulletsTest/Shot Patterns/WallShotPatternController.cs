@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 // spawns a wall of projectiles in the direction this object is facing.
 public class WallShotPatternController : MonoBehaviour {
@@ -9,6 +10,7 @@ public class WallShotPatternController : MonoBehaviour {
     public float shootDelay = 0.5f;
     public float shotsPerWall = 2; 
     public GameObject shotPrefab;
+    public UnityEvent shotFired; 
     private float counter = 0.0f;
 
 	
@@ -41,5 +43,7 @@ public class WallShotPatternController : MonoBehaviour {
                 shot.GetComponent<ForwardMover>().speed = speed;
             }
         }
+
+        shotFired.Invoke();
     }
 }

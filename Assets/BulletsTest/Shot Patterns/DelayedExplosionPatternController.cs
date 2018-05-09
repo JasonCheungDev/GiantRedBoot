@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DelayedExplosionPatternController : MonoBehaviour {
 
@@ -10,6 +11,8 @@ public class DelayedExplosionPatternController : MonoBehaviour {
     public float fireDelay = 1.0f;
     [Tooltip("Should be a number 360 is divisble by.")]
     public float angleBetweenShots = 15f;
+    public UnityEvent shotFired;
+    public UnityEvent shotExploded;
     private float nextFire = 0.0f;
 
     public float explosionDelay = 0.5f;
@@ -39,6 +42,8 @@ public class DelayedExplosionPatternController : MonoBehaviour {
             nextExplosion = Time.time + explosionDelay;  // explode bullet after explosionDelay
             singleShot = Instantiate(shotType, transform.position, transform.rotation) as GameObject;
             singleShot.GetComponent<ForwardMover>().speed = speed;
+
+            shotFired.Invoke();
         }
 
         if (Time.time > nextExplosion)
@@ -55,6 +60,9 @@ public class DelayedExplosionPatternController : MonoBehaviour {
 
             if (singleShot)
                 Destroy(singleShot);
+
+            shotExploded.Invoke();
         }
+
     }
 }

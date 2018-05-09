@@ -18,6 +18,9 @@ public class DragonController : MonoBehaviour {
     public GameObject LeftRightPattern;         // shot pattern used in head left to right attack
     public GameObject SwingPattern;             // shot pattern used in swing attack
 
+    public AudioSource fireshotSfx;
+    public AudioSource boomSfx; 
+
     private Coroutine firebreathCoroutine;
     private bool isFirebreathOn = false;
 
